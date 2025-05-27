@@ -1,19 +1,36 @@
 import UserInfo from "@/types/UserInfo";
 import instance from ".";
+import { storeToken } from "./storage";
 
 const login = async (userInfo: UserInfo) => {
   const { data } = await instance.post(
     "/mini-project/api/auth/login",
     userInfo
   );
+  if (data.token) {
+    await storeToken(data.token);
+  }
   return data;
 };
 
 const register = async (userInfo: UserInfo, image: string) => {
+  const formData = new FormData();
+
+  formData.append("username", userInfo.username);
+  formData.append("password", userInfo.password);
+  formData.append("image", {
+    name: "image.jpg",
+    uri: image,
+    type: "image/jpeg",
+  } as any);
+
   const { data } = await instance.post(
     "/mini-project/api/auth/register",
-    userInfo
+    formData
   );
+  if (data.token) {
+    await storeToken(data.token);
+  }
   return data;
 };
 
